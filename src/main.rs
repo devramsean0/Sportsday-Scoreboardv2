@@ -29,7 +29,7 @@ fn main() {
     if let Some(config_path) = args.config_path {
         match db_configurator::parser::DBConfiguration::from_yaml_file(&config_path) {
             Ok(config) => {
-                println!("Successfully loaded configuration from: {}", config_path);
+                /*  println!("Successfully loaded configuration from: {}", config_path);
                 println!("Years: {}", config.years.len());
                 println!("Forms: {}", config.forms.len());
                 println!("Events: {}", config.events.len());
@@ -41,7 +41,8 @@ fn main() {
                     for year in active_years {
                         println!("  - {}", year.name);
                     }
-                }
+                } */
+                db_configurator::build::build_plan(config);
             }
             Err(e) => {
                 eprintln!("Error loading config: {}", e);

@@ -12,12 +12,20 @@ years:
 forms:
   - id: s
     name: Sharman
+    applicable_years:
+      type: all
   - id: w
     name: Winston
+    applicable_years:
+      type: all
   - id: e
     name: Ennis
+    applicable_years:
+      type: all
   - id: t
     name: Turing
+    applicable_years:
+      type: all
 
 events:
   - id: 60m

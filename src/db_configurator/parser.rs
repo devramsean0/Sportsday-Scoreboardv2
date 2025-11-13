@@ -35,6 +35,8 @@ pub struct Form {
     pub id: String,
     /// Display name (e.g., "Year 7", "Reception")
     pub name: String,
+    // Rules for which years this form applies to
+    pub applicable_years: ApplicabilityRules,
 }
 
 /// Represents a sports event with flexible year/form applicability
@@ -54,8 +56,8 @@ pub struct Event {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Score {
-    name: String,
-    value: i64,
+    pub name: String,
+    pub value: i64,
 }
 
 /// Flexible rules for determining applicability
@@ -92,12 +94,12 @@ impl DBConfiguration {
     }
 
     /// Get events applicable to a specific year and form
-    pub fn applicable_events(&self, year_id: &str, form_id: &str) -> Vec<&Event> {
+    pub fn applicable_events(&self, year_id: &str, form_id: String) -> Vec<&Event> {
         self.events
             .iter()
             .filter(|event| {
                 self.is_event_applicable_to_year(event, year_id)
-                    && self.is_event_applicable_to_form(event, form_id)
+                    && self.is_event_applicable_to_form(event, form_id.clone())
             })
             .collect()
     }
@@ -113,12 +115,22 @@ impl DBConfiguration {
     }
 
     /// Check if an event applies to a specific form
-    pub fn is_event_applicable_to_form(&self, event: &Event, form_id: &str) -> bool {
+    pub fn is_event_applicable_to_form(&self, event: &Event, form_id: String) -> bool {
         match &event.applicable_forms {
             ApplicabilityRules::All => true,
             ApplicabilityRules::None => false,
-            ApplicabilityRules::Include { ids } => ids.contains(&form_id.to_string()),
-            ApplicabilityRules::Exclude { ids } => !ids.contains(&form_id.to_string()),
+            ApplicabilityRules::Include { ids } => ids.contains(&form_id),
+            ApplicabilityRules::Exclude { ids } => !ids.contains(&form_id),
+        }
+    }
+
+    /// Check if a year applies to a specific form
+    pub fn is_year_applicable_to_form(&self, form: &Form, year_id: String) -> bool {
+        match &form.applicable_years {
+            ApplicabilityRules::All => true,
+            ApplicabilityRules::None => false,
+            ApplicabilityRules::Include { ids } => ids.contains(&year_id),
+            ApplicabilityRules::Exclude { ids } => !ids.contains(&year_id),
         }
     }
 
