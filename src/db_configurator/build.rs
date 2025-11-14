@@ -50,7 +50,6 @@ pub fn build_plan(configuration: DBConfiguration) -> Plan {
                     year_plan.events.push(EventPlan {
                         id: format!("{}-{}-{}", year_plan.clone().id, gender, event.clone().id),
                         name: event.clone().name,
-                        year_id: year_plan.id.clone(),
                         gender_id: gender.clone(),
                     })
                 }
@@ -100,6 +99,5 @@ pub struct FormPlan {
 pub struct EventPlan {
     pub id: String,
     pub name: String,
-    pub year_id: String,
     pub gender_id: String,
 }

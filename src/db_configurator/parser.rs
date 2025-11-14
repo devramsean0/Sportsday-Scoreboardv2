@@ -86,13 +86,6 @@ impl DBConfiguration {
         Ok(config)
     }
 
-    /// Save configuration to YAML file
-    pub fn to_yaml_file(&self, path: &str) -> Result<(), Box<dyn std::error::Error>> {
-        let content = serde_yml::to_string(self)?;
-        std::fs::write(path, content)?;
-        Ok(())
-    }
-
     /// Get events applicable to a specific year and form
     pub fn applicable_events(&self, year_id: &str, form_id: String) -> Vec<&Event> {
         self.events
@@ -142,26 +135,6 @@ impl DBConfiguration {
             ApplicabilityRules::Include { ids } => ids.contains(&gender_id.to_string()),
             ApplicabilityRules::Exclude { ids } => !ids.contains(&gender_id.to_string()),
         }
-    }
-
-    /// Find a year by ID
-    pub fn find_year(&self, id: &str) -> Option<&Year> {
-        self.years.iter().find(|year| year.id == id)
-    }
-
-    /// Find a form by ID  
-    pub fn find_form(&self, id: &str) -> Option<&Form> {
-        self.forms.iter().find(|form| form.id == id)
-    }
-
-    /// Find an event by ID
-    pub fn find_event(&self, id: &str) -> Option<&Event> {
-        self.events.iter().find(|event| event.id == id)
-    }
-
-    /// Get Config Version
-    pub fn get_version(&self) -> String {
-        self.version.clone()
     }
 
     /// Get Scoring System
