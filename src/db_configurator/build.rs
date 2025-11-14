@@ -1,6 +1,6 @@
 use crate::db_configurator::parser::DBConfiguration;
 
-pub fn build_plan(configuration: DBConfiguration) {
+pub fn build_plan(configuration: DBConfiguration) -> Plan {
     let mut plan = Plan {
         year_plans: vec![],
         score_plan: vec![],
@@ -25,26 +25,34 @@ pub fn build_plan(configuration: DBConfiguration) {
                     name: form.clone().name,
                 };
                 year_plan.forms.push(form_plan.clone());
-                for event in config.events.iter() {
-                    if configuration.is_event_applicable_to_form(event, form.clone().id)
-                        && configuration.is_event_applicable_to_year(event, &year.clone().id)
-                    {
-                        for gender in config.genders.iter() {
-                            if configuration.is_event_applicable_to_gender(event, gender) {
-                                year_plan.events.push(EventPlan {
-                                    id: format!(
-                                        "{}-{}-{}",
-                                        year_plan.clone().id,
-                                        gender,
-                                        event.clone().id
-                                    ),
-                                    name: event.clone().name,
-                                    year_id: year_plan.id.clone(),
-                                    gender_id: gender.clone(),
-                                })
-                            };
-                        }
-                    };
+            }
+        }
+        for event in config.events.iter() {
+            if !configuration.is_event_applicable_to_year(event, &year.clone().id) {
+                continue;
+            }
+            let mut applies_to_at_least_one_form = false;
+            for form in config.forms.iter() {
+                if configuration.is_year_applicable_to_form(form, year_id.clone())
+                    && configuration.is_event_applicable_to_form(event, form.clone().id)
+                {
+                    applies_to_at_least_one_form = true;
+                    break;
+                }
+            }
+
+            if !applies_to_at_least_one_form {
+                continue;
+            }
+
+            for gender in config.genders.iter() {
+                if configuration.is_event_applicable_to_gender(event, gender) {
+                    year_plan.events.push(EventPlan {
+                        id: format!("{}-{}-{}", year_plan.clone().id, gender, event.clone().id),
+                        name: event.clone().name,
+                        year_id: year_plan.id.clone(),
+                        gender_id: gender.clone(),
+                    })
                 }
             }
         }
@@ -56,42 +64,42 @@ pub fn build_plan(configuration: DBConfiguration) {
             value: score.clone().value,
         })
     }
-    println!("Plan: {:#?}", plan)
+    plan
 }
 
 #[derive(Debug)]
-struct Plan {
-    year_plans: Vec<YearPlan>,
-    score_plan: Vec<ScorePlan>,
+pub struct Plan {
+    pub year_plans: Vec<YearPlan>,
+    pub score_plan: Vec<ScorePlan>,
 }
 
 #[derive(Debug)]
-struct ScorePlan {
-    name: String,
-    value: i64,
+pub struct ScorePlan {
+    pub name: String,
+    pub value: i64,
 }
 
 #[derive(Debug, Clone)]
 
-struct YearPlan {
-    id: String,
-    name: String,
-    forms: Vec<FormPlan>,
-    events: Vec<EventPlan>,
+pub struct YearPlan {
+    pub id: String,
+    pub name: String,
+    pub forms: Vec<FormPlan>,
+    pub events: Vec<EventPlan>,
 }
 
 #[derive(Debug, Clone)]
 
-struct FormPlan {
-    id: String,
-    name: String,
+pub struct FormPlan {
+    pub id: String,
+    pub name: String,
 }
 
 #[derive(Debug, Clone)]
 
-struct EventPlan {
-    id: String,
-    name: String,
-    year_id: String,
-    gender_id: String,
+pub struct EventPlan {
+    pub id: String,
+    pub name: String,
+    pub year_id: String,
+    pub gender_id: String,
 }

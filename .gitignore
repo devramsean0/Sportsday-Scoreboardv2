@@ -2,5 +2,7 @@
 /result
 /result-lib
 .direnv
+db.sqlite
+version.txt
 
 /.pre-commit-config.yaml

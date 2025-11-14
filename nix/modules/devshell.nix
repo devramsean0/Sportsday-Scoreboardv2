@@ -1,12 +1,11 @@
 { inputs, ... }:
 {
   perSystem =
-    {
-      config,
-      self',
-      pkgs,
-      lib,
-      ...
+    { config
+    , self'
+    , pkgs
+    , lib
+    , ...
     }:
     {
       devShells.default = pkgs.mkShell {
@@ -19,6 +18,7 @@
           just
           nixd # Nix language server
           bacon
+          sqlite
           #config.process-compose.cargo-doc-live.outputs.package
         ];
       };
