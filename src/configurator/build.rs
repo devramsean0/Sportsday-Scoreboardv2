@@ -4,7 +4,6 @@ pub fn build_plan(configuration: Configuration) -> Plan {
     let mut plan = Plan {
         year_plans: vec![],
         form_plan: vec![],
-        score_plan: vec![],
     };
     let config = &configuration;
 
@@ -59,12 +58,6 @@ pub fn build_plan(configuration: Configuration) -> Plan {
         }
         plan.year_plans.push(year_plan);
     }
-    for score in config.scores.iter() {
-        plan.score_plan.push(ScorePlan {
-            name: score.clone().name,
-            value: score.clone().value,
-        })
-    }
     plan
 }
 
@@ -72,13 +65,6 @@ pub fn build_plan(configuration: Configuration) -> Plan {
 pub struct Plan {
     pub year_plans: Vec<YearPlan>,
     pub form_plan: Vec<FormPlan>,
-    pub score_plan: Vec<ScorePlan>,
-}
-
-#[derive(Debug)]
-pub struct ScorePlan {
-    pub name: String,
-    pub value: i64,
 }
 
 #[derive(Debug, Clone)]

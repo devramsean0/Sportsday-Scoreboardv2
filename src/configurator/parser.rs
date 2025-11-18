@@ -56,6 +56,7 @@ pub struct Event {
 pub struct Score {
     pub name: String,
     pub value: i64,
+    pub default: bool,
 }
 
 /// Flexible rules for determining applicability

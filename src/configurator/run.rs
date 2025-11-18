@@ -3,16 +3,11 @@ use log::{debug, info};
 
 use crate::{
     configurator::build::Plan,
-    db::{forms::Forms, scores::Scores, years::Years},
+    db::{forms::Forms, years::Years},
 };
 
 pub async fn run(plan: Plan, pool: &Pool) -> Result<(), async_sqlite::Error> {
     info!("Implementing Plan");
-    for score in plan.score_plan.iter() {
-        Scores::new(score.name.clone(), score.value)
-            .insert(&pool)
-            .await?;
-    }
 
     // Create forms globally (not tied to years)
     for form in plan.form_plan.iter() {

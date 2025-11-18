@@ -1,10 +1,10 @@
-/* @font-face {
+@font-face {
     font-family: "Frankin-Gothic-Demi";
-    src: url('fonts/FRADM.ttf') format('truetype');
-} */
+    src: url('/assets/FRADM.ttf') format('truetype');
+}
 
 html {
-    /* font-family: 'Frankin-Gothic-Demi', sans-serif; */
+    font-family: 'Frankin-Gothic-Demi', sans-serif;
     font-size: 1.5vw;
     line-height: 1.5;
     color: #333;

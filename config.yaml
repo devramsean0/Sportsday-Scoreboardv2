@@ -108,11 +108,16 @@ events:
 scores:
   - name: "1st"
     value: 20
+    default: false
   - name: "2nd"
     value: 15
+    default: false
   - name: "3rd"
     value: 10
+    default: false
   - name: "4th"
     value: 5
+    default: false
   - name: "Nothing"
     value: 0
+    default: true

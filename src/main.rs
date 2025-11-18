@@ -90,6 +90,7 @@ async fn main() -> std::io::Result<()> {
             .service(Files::new("assets/", "assets/"))
             .service(routes::index::get)
             .service(routes::scoreboard::get)
+            .service(routes::set_scores::get)
     })
     .bind((host, port))?
     .run()

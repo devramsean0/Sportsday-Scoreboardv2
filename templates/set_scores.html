@@ -1,0 +1,44 @@
+{% extends "layouts/index.html" %}
+{% block content %}
+<div class='settable'>
+    <table border=1>
+        <tr>
+            <th>Activity</th>
+            <th>Year</th>
+            <th>Group</th>
+            {% for form in forms %}
+            <th>{{ form.name }}</th>
+            {% endfor %}
+            <th>Change Score</th>
+        </tr>
+        {% for event in events %}
+        <tr>
+            <form>
+                <td>
+                    {{ event.name }}
+                </td>
+                <td>
+                    {{ event.year_id }}
+                </td>
+                <td>
+                    {{ event.gender_id }}
+                </td>
+                {% for form in forms %}
+                <td style="background-color: {{ form.colour }};">
+                    <select id="{{ event.id }}-{{ form.id }}">
+                        {% for score in scores %}
+                        <option value="{{ score.value }}" {% if score.default %} selected=true {% endif %}>{{
+                            score.name }}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+                {% endfor %}
+                <td class="setscorebutt">
+                    <button>Set Score</button>
+                </td>
+            </form>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock content %}

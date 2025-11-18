@@ -1,7 +1,10 @@
 use askama::Template;
 use std::collections::HashMap;
 
-use crate::{configurator::parser::Form, db::years::Years};
+use crate::{
+    configurator::parser::{Form, Score},
+    db::{events::Events, years::Years},
+};
 
 #[derive(Template)]
 #[template(path = "index.html")]
@@ -16,4 +19,12 @@ pub struct ScoreboardTemplate {
     pub year_totals: HashMap<String, i64>,
     pub form_totals: HashMap<String, i64>,
     pub grand_total: i64,
+}
+
+#[derive(Template)]
+#[template(path = "set_scores.html")]
+pub struct SetScoresTemplate {
+    pub events: Vec<Events>,
+    pub forms: Vec<Form>,
+    pub scores: Vec<Score>,
 }

@@ -2,21 +2,11 @@ use async_sqlite::Pool;
 
 pub mod events;
 pub mod forms;
-pub mod scores;
 pub mod years;
 
 pub async fn create_tables(pool: &Pool) -> Result<(), async_sqlite::Error> {
     pool.conn(move |conn| {
         conn.execute("PRAGMA foreign_keys = ON", []).unwrap();
-
-        conn.execute(
-            "CREATE TABLE IF NOT EXISTS scores (
-                name TEXT PRIMARY KEY,
-                value INTEGER NOT NULL
-            );",
-            [],
-        )
-        .unwrap();
 
         conn.execute(
             "CREATE TABLE IF NOT EXISTS years (
