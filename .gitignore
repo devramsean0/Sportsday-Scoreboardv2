@@ -1,8 +1,12 @@
 /target
 /result
 /result-lib
+/node_modules
 .direnv
+
+assets/index.js
 db.sqlite
 version.txt
+.env
 
 /.pre-commit-config.yaml

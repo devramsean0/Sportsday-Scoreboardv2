@@ -1,16 +1,18 @@
 use std::io::{Error, ErrorKind};
 
+use actix::{Actor, Addr};
 use actix_files::Files;
 use actix_web::{middleware as ActixMiddleware, web, App, HttpServer};
 use async_sqlite::PoolBuilder;
 use log::debug;
 
-use crate::configurator::parser::Configuration;
+use crate::{configurator::parser::Configuration, websocket::ChannelsActor};
 
 mod configurator;
 mod db;
 mod routes;
 mod templates;
+mod websocket;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -79,6 +81,8 @@ async fn main() -> std::io::Result<()> {
         }
     };
 
+    let ws_channels: Addr<ChannelsActor> = ChannelsActor::new().start();
+
     HttpServer::new(move || {
         App::new()
             .wrap(ActixMiddleware::Logger::default())
@@ -87,10 +91,12 @@ async fn main() -> std::io::Result<()> {
                 config: config.clone(),
                 pool: pool.clone(),
             }))
+            .app_data(web::Data::new(ws_channels.clone()))
             .service(Files::new("assets/", "assets/"))
             .service(routes::index::get)
             .service(routes::scoreboard::get)
             .service(routes::set_scores::get)
+            .service(routes::ws::get)
     })
     .bind((host, port))?
     .run()

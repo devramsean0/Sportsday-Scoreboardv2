@@ -19,6 +19,8 @@
           nixd # Nix language server
           bacon
           sqlite
+          scc
+          bun
           #config.process-compose.cargo-doc-live.outputs.package
         ];
       };
