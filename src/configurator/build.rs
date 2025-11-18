@@ -1,6 +1,6 @@
-use crate::db_configurator::parser::DBConfiguration;
+use crate::configurator::parser::Configuration;
 
-pub fn build_plan(configuration: DBConfiguration) -> Plan {
+pub fn build_plan(configuration: Configuration) -> Plan {
     let mut plan = Plan {
         year_plans: vec![],
         form_plan: vec![],
@@ -48,7 +48,6 @@ pub fn build_plan(configuration: DBConfiguration) -> Plan {
 
             for gender in config.genders.iter() {
                 if configuration.is_event_applicable_to_gender(event, gender) {
-                    println!("{}", empty_scores);
                     year_plan.events.push(EventPlan {
                         id: format!("{}-{}-{}", year_plan.clone().id, gender, event.clone().id),
                         name: event.clone().name,

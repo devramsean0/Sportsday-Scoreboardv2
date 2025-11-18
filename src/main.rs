@@ -5,10 +5,10 @@ use actix_web::{middleware as ActixMiddleware, web, App, HttpServer};
 use async_sqlite::PoolBuilder;
 use log::debug;
 
-use crate::db_configurator::parser::DBConfiguration;
+use crate::configurator::parser::Configuration;
 
+mod configurator;
 mod db;
-mod db_configurator;
 mod routes;
 mod templates;
 
@@ -54,21 +54,21 @@ async fn main() -> std::io::Result<()> {
         .unwrap();
 
     // Create the Plan & Run it
-    let config = match db_configurator::parser::DBConfiguration::from_yaml_file("./config.yaml") {
+    let config = match configurator::parser::Configuration::from_yaml_file("./config.yaml") {
         Ok(config) => {
-            let plan = db_configurator::build::build_plan(config.clone());
+            let plan = configurator::build::build_plan(config.clone());
             // Check if the version has already been built
             if std::fs::exists("./version.txt").unwrap() {
                 if std::fs::read_to_string("./version.txt").unwrap() == config.get_version() {
                     debug!("Config Version matches DB, not rebuilding");
                 } else {
                     debug!("Config Version doesn't match DB, rebuilding");
-                    db_configurator::run::run(plan, &pool).await.unwrap();
+                    configurator::run::run(plan, &pool).await.unwrap();
                     std::fs::write("./version.txt", config.get_version())?;
                 }
             } else {
                 debug!("Version state doesn't exist, rebuilding");
-                db_configurator::run::run(plan, &pool).await.unwrap();
+                configurator::run::run(plan, &pool).await.unwrap();
                 std::fs::write("./version.txt", config.get_version())?;
             }
             config
@@ -99,6 +99,6 @@ async fn main() -> std::io::Result<()> {
 
 struct AppState {
     client: reqwest::Client,
-    config: DBConfiguration,
+    config: Configuration,
     pool: async_sqlite::Pool,
 }

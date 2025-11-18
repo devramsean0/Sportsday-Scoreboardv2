@@ -2,8 +2,8 @@ use async_sqlite::Pool;
 use log::{debug, info};
 
 use crate::{
+    configurator::build::Plan,
     db::{forms::Forms, scores::Scores, years::Years},
-    db_configurator::build::Plan,
 };
 
 pub async fn run(plan: Plan, pool: &Pool) -> Result<(), async_sqlite::Error> {

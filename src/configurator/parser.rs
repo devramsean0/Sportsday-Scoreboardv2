@@ -1,10 +1,8 @@
-use std::collections::HashMap;
-
 use serde::{Deserialize, Serialize};
 
 /// Main configuration structure containing all years, forms, and events
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct DBConfiguration {
+pub struct Configuration {
     /// Config Version
     pub version: String,
     /// Genders for Events
@@ -76,23 +74,12 @@ pub enum ApplicabilityRules {
     Exclude { ids: Vec<String> },
 }
 
-impl DBConfiguration {
+impl Configuration {
     /// Load configuration from YAML file
     pub fn from_yaml_file(path: &str) -> Result<Self, Box<dyn std::error::Error>> {
         let content = std::fs::read_to_string(path)?;
-        let config: DBConfiguration = serde_yml::from_str(&content)?;
+        let config: Configuration = serde_yml::from_str(&content)?;
         Ok(config)
-    }
-
-    /// Get events applicable to a specific year and form
-    pub fn applicable_events(&self, year_id: &str, form_id: String) -> Vec<&Event> {
-        self.events
-            .iter()
-            .filter(|event| {
-                self.is_event_applicable_to_year(event, year_id)
-                    && self.is_event_applicable_to_form(event, form_id.clone())
-            })
-            .collect()
     }
 
     /// Check if an event applies to a specific year
@@ -123,16 +110,6 @@ impl DBConfiguration {
             ApplicabilityRules::Include { ids } => ids.contains(&gender_id.to_string()),
             ApplicabilityRules::Exclude { ids } => !ids.contains(&gender_id.to_string()),
         }
-    }
-
-    /// Get Scoring System
-    pub fn get_scores(&mut self) -> HashMap<String, i64> {
-        let mut map: HashMap<String, i64> = HashMap::new();
-        self.scores.sort_by(|a, b| a.value.cmp(&b.value));
-        for score in self.scores.clone() {
-            map.insert(score.name, score.value);
-        }
-        map
     }
 
     /// Get Schema Version
