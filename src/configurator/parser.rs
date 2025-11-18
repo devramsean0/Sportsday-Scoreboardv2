@@ -33,6 +33,8 @@ pub struct Form {
     pub id: String,
     /// Display name (e.g., "Year 7", "Reception")
     pub name: String,
+    /// Colour (lightgreen, #fdfd80, rgb(249, 164, 164))
+    pub colour: String,
 }
 
 /// Represents a sports event with flexible year/form applicability

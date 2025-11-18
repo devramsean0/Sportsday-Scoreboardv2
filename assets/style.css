@@ -1,4 +1,3 @@
-/* ...existing code... */
 /* @font-face {
     font-family: "Frankin-Gothic-Demi";
     src: url('fonts/FRADM.ttf') format('truetype');
@@ -107,22 +106,6 @@ a:hover {
 
 a:visited {
     color: #fff;
-}
-
-.turing {
-    background-color: lightgreen;
-}
-
-.sharman {
-    background-color: #fdfd80;
-}
-
-.ennis {
-    background-color: rgb(249, 164, 164);
-}
-
-.winston {
-    background-color: lightblue;
 }
 
 .linkgon {

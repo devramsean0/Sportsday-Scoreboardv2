@@ -3,14 +3,14 @@ use askama::Template;
 use std::collections::HashMap;
 
 use crate::{
-    db::{events::Events, forms::Forms, years::Years},
+    db::{events::Events, years::Years},
     templates::ScoreboardTemplate,
     AppState,
 };
 
 #[get("/scoreboard")]
 pub async fn get(state: web::Data<AppState>) -> HttpResponse {
-    let forms = Forms::all(&state.pool).await.unwrap();
+    let forms: Vec<crate::configurator::parser::Form> = state.config.forms.clone();
     let years = Years::all(&state.pool).await.unwrap();
     let events = Events::all(&state.pool).await.unwrap();
 
