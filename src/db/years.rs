@@ -1,12 +1,11 @@
-use async_sqlite::Pool;
+use async_sqlite::{rusqlite::Row, Pool};
 
-use crate::db::{events::Events, forms::Forms};
+use crate::db::events::Events;
 
 #[derive(Clone)]
 pub struct Years {
-    id: String,
-    name: String,
-    forms: Vec<Forms>,
+    pub id: String,
+    pub name: String,
     events: Vec<Events>, // TODO: Events as optionals
 }
 
@@ -15,9 +14,16 @@ impl Years {
         Self {
             id,
             name,
-            forms: vec![],
             events: vec![],
         }
+    }
+
+    fn map_from_row(row: &Row) -> Result<Self, async_sqlite::Error> {
+        Ok(Self {
+            id: row.get(0)?,
+            name: row.get(1)?,
+            events: vec![],
+        })
     }
 
     pub async fn insert(self, pool: &Pool) -> Result<Self, async_sqlite::Error> {
@@ -32,17 +38,20 @@ impl Years {
         Ok(self)
     }
 
-    pub async fn new_form(
-        mut self,
-        pool: &Pool,
-        id: String,
-        name: String,
-    ) -> Result<Self, async_sqlite::Error> {
-        let form = Forms::new(id, name, self.clone().id);
-        self.forms.push(form.clone());
-        form.insert(&pool).await?;
+    pub async fn all(pool: &Pool) -> Result<Vec<Self>, async_sqlite::Error> {
+        pool.conn(move |conn| {
+            let mut stmt = conn.prepare("SELECT * FROM years")?;
+            let year_iter = stmt
+                .query_map([], |row| Ok(Self::map_from_row(row).unwrap()))
+                .unwrap();
+            let mut years = Vec::new();
 
-        Ok(self)
+            for year in year_iter {
+                years.push(year?);
+            }
+            Ok(years)
+        })
+        .await
     }
 
     pub async fn new_event(
@@ -51,8 +60,9 @@ impl Years {
         id: String,
         name: String,
         gender_id: String,
+        scores: String,
     ) -> Result<Self, async_sqlite::Error> {
-        let event = Events::new(id, name, self.clone().id, gender_id);
+        let event = Events::new(id, name, self.clone().id, gender_id, scores);
         self.events.push(event.clone());
         event.insert(&pool).await?;
 

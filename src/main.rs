@@ -1,11 +1,16 @@
 use std::io::{Error, ErrorKind};
 
-use actix_web::{App, HttpServer};
+use actix_files::Files;
+use actix_web::{middleware as ActixMiddleware, web, App, HttpServer};
 use async_sqlite::PoolBuilder;
 use log::debug;
 
+use crate::db_configurator::parser::DBConfiguration;
+
 mod db;
 mod db_configurator;
+mod routes;
+mod templates;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -42,34 +47,58 @@ async fn main() -> std::io::Result<()> {
         }
     }
 
+    // Reqwest Client
+    let client = reqwest::Client::builder()
+        .user_agent("SportsDayScore")
+        .build()
+        .unwrap();
+
     // Create the Plan & Run it
-    match db_configurator::parser::DBConfiguration::from_yaml_file("./config.yaml") {
+    let config = match db_configurator::parser::DBConfiguration::from_yaml_file("./config.yaml") {
         Ok(config) => {
             let plan = db_configurator::build::build_plan(config.clone());
             // Check if the version has already been built
             if std::fs::exists("./version.txt").unwrap() {
-                if std::fs::read_to_string("./version.txt").unwrap() == config.version {
+                if std::fs::read_to_string("./version.txt").unwrap() == config.get_version() {
                     debug!("Config Version matches DB, not rebuilding");
                 } else {
                     debug!("Config Version doesn't match DB, rebuilding");
                     db_configurator::run::run(plan, &pool).await.unwrap();
-                    std::fs::write("./version.txt", config.version)?;
+                    std::fs::write("./version.txt", config.get_version())?;
                 }
             } else {
                 debug!("Version state doesn't exist, rebuilding");
                 db_configurator::run::run(plan, &pool).await.unwrap();
-                std::fs::write("./version.txt", config.version)?;
+                std::fs::write("./version.txt", config.get_version())?;
             }
+            config
         }
         Err(e) => {
             eprintln!("Error loading config: {}", e);
             std::process::exit(1);
         }
-    }
+    };
 
-    HttpServer::new(|| App::new())
-        .bind((host, port))?
-        .run()
-        .await?;
+    HttpServer::new(move || {
+        App::new()
+            .wrap(ActixMiddleware::Logger::default())
+            .app_data(web::Data::new(AppState {
+                client: client.clone(),
+                config: config.clone(),
+                pool: pool.clone(),
+            }))
+            .service(Files::new("assets/", "assets/"))
+            .service(routes::index::get)
+            .service(routes::scoreboard::get)
+    })
+    .bind((host, port))?
+    .run()
+    .await?;
     Ok(())
+}
+
+struct AppState {
+    client: reqwest::Client,
+    config: DBConfiguration,
+    pool: async_sqlite::Pool,
 }

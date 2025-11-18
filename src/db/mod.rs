@@ -30,9 +30,7 @@ pub async fn create_tables(pool: &Pool) -> Result<(), async_sqlite::Error> {
         conn.execute(
             "CREATE TABLE IF NOT EXISTS forms (
                 id TEXT PRIMARY KEY,
-                name TEXT NOT NULL,
-                year_id TEXT NOT NULL,
-                FOREIGN KEY (year_id) REFERENCES years(id)
+                name TEXT NOT NULL
             );",
             [],
         )
@@ -44,11 +42,13 @@ pub async fn create_tables(pool: &Pool) -> Result<(), async_sqlite::Error> {
                 name TEXT NOT NULL,
                 year_id TEXT NOT NULL,
                 gender_id TEXT NOT NULL,
+                scores TEXT NOT NULL DEFAULT '{}',
                 FOREIGN KEY (year_id) REFERENCES years(id)
             );",
             [],
         )
         .unwrap();
+
         Ok(())
     })
     .await?;

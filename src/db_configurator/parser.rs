@@ -35,8 +35,6 @@ pub struct Form {
     pub id: String,
     /// Display name (e.g., "Year 7", "Reception")
     pub name: String,
-    // Rules for which years this form applies to
-    pub applicable_years: ApplicabilityRules,
 }
 
 /// Represents a sports event with flexible year/form applicability
@@ -117,16 +115,6 @@ impl DBConfiguration {
         }
     }
 
-    /// Check if a year applies to a specific form
-    pub fn is_year_applicable_to_form(&self, form: &Form, year_id: String) -> bool {
-        match &form.applicable_years {
-            ApplicabilityRules::All => true,
-            ApplicabilityRules::None => false,
-            ApplicabilityRules::Include { ids } => ids.contains(&year_id),
-            ApplicabilityRules::Exclude { ids } => !ids.contains(&year_id),
-        }
-    }
-
     /// Check if an event applies to a specific gender
     pub fn is_event_applicable_to_gender(&self, event: &Event, gender_id: &str) -> bool {
         match &event.applicable_genders {
@@ -145,5 +133,10 @@ impl DBConfiguration {
             map.insert(score.name, score.value);
         }
         map
+    }
+
+    /// Get Schema Version
+    pub fn get_version(&self) -> String {
+        self.version.clone()
     }
 }
