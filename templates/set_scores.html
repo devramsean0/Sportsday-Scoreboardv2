@@ -1,6 +1,9 @@
 {% extends "layouts/index.html" %}
 {% block content %}
+
 <div class='settable'>
+    <div data-controller="score-manager" data-score-manager-target="container"
+        style="display: none; visibility: hidden;">{}</div>
     <table border=1>
         <tr>
             <th>Activity</th>
@@ -12,31 +15,29 @@
             <th>Change Score</th>
         </tr>
         {% for event in events %}
-        <tr>
-            <form>
-                <td>
-                    {{ event.name }}
-                </td>
-                <td>
-                    {{ event.year_id }}
-                </td>
-                <td>
-                    {{ event.gender_id }}
-                </td>
-                {% for form in forms %}
-                <td style="background-color: {{ form.colour }};">
-                    <select id="{{ event.id }}-{{ form.id }}">
-                        {% for score in scores %}
-                        <option value="{{ score.value }}" {% if score.default %} selected=true {% endif %}>{{
-                            score.name }}</option>
-                        {% endfor %}
-                    </select>
-                </td>
-                {% endfor %}
-                <td class="setscorebutt">
-                    <button>Set Score</button>
-                </td>
-            </form>
+        <tr data-controller="score-set" data-score-set-target="form" id="{{ event.id }}">
+            <td>
+                {{ event.name }}
+            </td>
+            <td>
+                {{ event.year_id }}
+            </td>
+            <td>
+                {{ event.gender_id }}
+            </td>
+            {% for form in forms %}
+            <td style="background-color: {{ form.colour }};">
+                <select id="{{ event.id }}-{{ form.id }}" data-score-set-target="field">
+                    {% for score in scores %}
+                    <option value="{{ score.value }}" {% if score.default %} selected=true {% endif %}>{{
+                        score.name }}</option>
+                    {% endfor %}
+                </select>
+            </td>
+            {% endfor %}
+            <td class="setscorebutt">
+                <button type="button" data-action="click->score-set#submit">Set Score</button>
+            </td>
         </tr>
         {% endfor %}
     </table>

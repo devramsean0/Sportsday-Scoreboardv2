@@ -1,5 +1,6 @@
 use async_sqlite::{rusqlite::Row, Pool};
 use log::debug;
+use serde_json::Value;
 
 #[derive(Clone)]
 pub struct Events {
@@ -65,5 +66,23 @@ impl Events {
             Ok(events)
         })
         .await
+    }
+
+    pub async fn set_scores(
+        pool: &Pool,
+        id: String,
+        scores: Value,
+    ) -> Result<(), async_sqlite::Error> {
+        pool.conn(move |conn| {
+            debug!("Setting Scores for Event with id {}", id);
+            conn.execute(
+                "UPDATE events SET scores = ?1 WHERE id = ?2;",
+                [serde_json::to_string(&scores).unwrap(), id],
+            )
+            .unwrap();
+            Ok(())
+        })
+        .await?;
+        Ok(())
     }
 }

@@ -12,6 +12,7 @@ mod configurator;
 mod db;
 mod routes;
 mod templates;
+mod utils;
 mod websocket;
 
 #[actix_web::main]
@@ -95,6 +96,7 @@ async fn main() -> std::io::Result<()> {
             .service(Files::new("assets/", "assets/"))
             .service(routes::index::get)
             .service(routes::scoreboard::get)
+            .service(routes::set_scores::post)
             .service(routes::set_scores::get)
             .service(routes::ws::get)
     })

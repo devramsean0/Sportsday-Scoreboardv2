@@ -13,6 +13,12 @@ pub struct IndexTemplate {}
 #[derive(Template)]
 #[template(path = "scoreboard.html")]
 pub struct ScoreboardTemplate {
+    pub scores: String,
+}
+
+#[derive(Template)]
+#[template(path = "partials/scoreboard.html")]
+pub struct ScoreboardPartialTemplate {
     pub forms: Vec<Form>,
     pub years: Vec<Years>,
     pub scores: HashMap<String, HashMap<String, i64>>,
