@@ -27,7 +27,7 @@ jobs:
                   username: devramsean0
                   password: ${{ secrets.GITHUB_TOKEN }}
             - name: Build Docker image
-              run: docker build -t ghcr.io/devramsean0/sportsday-scoreboard-v2:latest
+              run: docker build -t ghcr.io/devramsean0/sportsday-scoreboard-v2:latest .
             - name: Push Docker image
               run: docker push ghcr.io/devramsean0/sportsday-scoreboard-v2:latest
     deploy:
