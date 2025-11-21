@@ -1,22 +1,11 @@
 use crate::configurator::parser::Configuration;
 
 pub fn build_plan(configuration: Configuration) -> Plan {
-    let mut plan = Plan {
-        year_plans: vec![],
-        form_plan: vec![],
-    };
+    let mut plan = Plan { year_plans: vec![] };
     let config = &configuration;
 
-    let mut empty_scores = serde_json::json!({});
+    let empty_scores = serde_json::json!({});
 
-    // Create forms globally (not tied to specific years)
-    for form in config.forms.iter() {
-        empty_scores[form.id.clone()] = 0.into();
-        plan.form_plan.push(FormPlan {
-            id: form.id.clone(),
-            name: form.name.clone(),
-        });
-    }
     let empty_scores = empty_scores.to_string();
 
     for year in config.years.iter() {
@@ -64,7 +53,6 @@ pub fn build_plan(configuration: Configuration) -> Plan {
 #[derive(Debug)]
 pub struct Plan {
     pub year_plans: Vec<YearPlan>,
-    pub form_plan: Vec<FormPlan>,
 }
 
 #[derive(Debug, Clone)]
@@ -73,13 +61,6 @@ pub struct YearPlan {
     pub id: String,
     pub name: String,
     pub events: Vec<EventPlan>,
-}
-
-#[derive(Debug, Clone)]
-
-pub struct FormPlan {
-    pub id: String,
-    pub name: String,
 }
 
 #[derive(Debug, Clone)]

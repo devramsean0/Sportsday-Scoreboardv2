@@ -1,7 +1,6 @@
 use async_sqlite::Pool;
 
 pub mod events;
-pub mod forms;
 pub mod years;
 
 pub async fn create_tables(pool: &Pool) -> Result<(), async_sqlite::Error> {
@@ -10,15 +9,6 @@ pub async fn create_tables(pool: &Pool) -> Result<(), async_sqlite::Error> {
 
         conn.execute(
             "CREATE TABLE IF NOT EXISTS years (
-                id TEXT PRIMARY KEY,
-                name TEXT NOT NULL
-            );",
-            [],
-        )
-        .unwrap();
-
-        conn.execute(
-            "CREATE TABLE IF NOT EXISTS forms (
                 id TEXT PRIMARY KEY,
                 name TEXT NOT NULL
             );",

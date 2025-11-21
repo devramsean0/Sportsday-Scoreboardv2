@@ -2,12 +2,7 @@ use actix_web::{get, web, HttpResponse};
 use askama::Template;
 use serde_json::Value;
 
-use crate::{
-    configurator::parser::Year,
-    db,
-    templates::{IndexTemplate, ResultsTemplate},
-    AppState,
-};
+use crate::{configurator::parser::Year, db, templates::ResultsTemplate, AppState};
 
 #[get("/results")]
 pub async fn get(state: web::Data<AppState>) -> HttpResponse {

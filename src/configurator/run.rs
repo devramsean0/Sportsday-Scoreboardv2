@@ -1,21 +1,10 @@
 use async_sqlite::Pool;
 use log::{debug, info};
 
-use crate::{
-    configurator::build::Plan,
-    db::{forms::Forms, years::Years},
-};
+use crate::{configurator::build::Plan, db::years::Years};
 
 pub async fn run(plan: Plan, pool: &Pool) -> Result<(), async_sqlite::Error> {
     info!("Implementing Plan");
-
-    // Create forms globally (not tied to years)
-    for form in plan.form_plan.iter() {
-        debug!("Inserting Planned Form {}", form.id);
-        Forms::new(form.id.clone(), form.name.clone())
-            .insert(&pool)
-            .await?;
-    }
 
     for year in plan.year_plans.iter() {
         debug!("Inserting Planned Year {}", year.id);

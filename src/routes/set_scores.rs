@@ -34,7 +34,6 @@ pub async fn post(
     for events in body.as_object().unwrap() {
         let event_id = events.0;
         let event_scores = events.1;
-        println!("Making DB Call with {} and {:#?}", event_id, event_scores);
         db::events::Events::set_scores(&state.pool, event_id.to_owned(), event_scores.to_owned())
             .await
             .unwrap();
