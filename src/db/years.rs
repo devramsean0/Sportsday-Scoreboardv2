@@ -68,4 +68,13 @@ impl Years {
 
         Ok(self)
     }
+
+    pub async fn delete_all(pool: &Pool) -> Result<(), async_sqlite::Error> {
+        pool.conn(move |conn| {
+            conn.execute("DELETE FROM years;", []).unwrap();
+            Ok(())
+        })
+        .await?;
+        Ok(())
+    }
 }

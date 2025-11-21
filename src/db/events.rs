@@ -85,4 +85,13 @@ impl Events {
         .await?;
         Ok(())
     }
+
+    pub async fn delete_all(pool: &Pool) -> Result<(), async_sqlite::Error> {
+        pool.conn(move |conn| {
+            conn.execute("DELETE FROM events;", []).unwrap();
+            Ok(())
+        })
+        .await?;
+        Ok(())
+    }
 }
