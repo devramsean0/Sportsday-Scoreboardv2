@@ -30,15 +30,7 @@ export default class extends Controller {
                 console.log("Score Manager: Obtained Lock")
                 const data = JSON.parse(this.containerTarget.innerText);
                 if (Object.keys(data).length != 0) {
-                    let res = await fetch("/set_scores", {
-                        method: "POST",
-                        body: this.containerTarget.innerText,
-                    });
-                    if (res.status == 204) {
-                        this.containerTarget.innerText = "{}";
-                    } else {
-                        console.log(`Set Scores failed with status ${res.status}:`, res.body);
-                    }
+                    await this.postUpdatedScore();
                 }
                 location.search = e.detail.params
                 this.lockValue = String(false);
@@ -50,15 +42,7 @@ export default class extends Controller {
             if (!this.getLockState()) {
                 this.lockValue = String(true);
                 console.log("Score Manager: Obtained Lock");
-                let res = await fetch("/set_scores", {
-                    method: "POST",
-                    body: this.containerTarget.innerText,
-                });
-                if (res.status == 204) {
-                    this.containerTarget.innerText = "{}";
-                } else {
-                    console.log(`Set Scores failed with status ${res.status}:`, res.body);
-                }
+                await this.postUpdatedScore();
                 this.lockValue = String(false);
                 console.log("Score Manager: Released Lock")
             } else {
@@ -69,6 +53,22 @@ export default class extends Controller {
 
     getLockState() {
         return Boolean(this.lockValue);
+    }
+
+    async postUpdatedScore() {
+        try {
+            let res = await fetch("/set_scores", {
+                method: "POST",
+                body: this.containerTarget.innerText,
+            });
+            if (res.status == 204) {
+                this.containerTarget.innerText = "{}";
+            } else {
+                console.log(`Set Scores failed with status ${res.status}:`, res.body);
+            }
+        } catch (e) {
+            console.log("Score Manager Error: ", e);
+        }
     }
 
     declare lockValue: string;

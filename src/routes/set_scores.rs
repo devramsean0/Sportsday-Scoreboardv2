@@ -50,7 +50,6 @@ pub async fn post(
     }
 
     let scores = crate::utils::render_scoreboard(state).await;
-    println!("Sending Scores Update");
     channels.do_send(Publish {
         channel: "scores".to_string(),
         payload: scores,
