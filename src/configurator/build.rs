@@ -4,7 +4,11 @@ pub fn build_plan(configuration: Configuration) -> Plan {
     let mut plan = Plan { year_plans: vec![] };
     let config = &configuration;
 
-    let empty_scores = serde_json::json!({});
+    let mut empty_scores = serde_json::json!({});
+
+    for form in config.forms.iter() {
+        empty_scores[form.id.clone()] = 0.into();
+    }
 
     let empty_scores = empty_scores.to_string();
 
