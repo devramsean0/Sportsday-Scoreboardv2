@@ -6,10 +6,15 @@ use actix_web::{middleware as ActixMiddleware, web, App, HttpServer};
 use async_sqlite::PoolBuilder;
 use log::debug;
 
-use crate::{configurator::parser::Configuration, websocket::ChannelsActor};
+use crate::{
+    configurator::parser::Configuration,
+    middleware::authentication::{AuthConfig, Authentication},
+    websocket::ChannelsActor,
+};
 
 mod configurator;
 mod db;
+mod middleware;
 mod routes;
 mod templates;
 mod utils;
@@ -26,6 +31,9 @@ async fn main() -> std::io::Result<()> {
         .parse::<u16>()
         .unwrap_or(3000);
     let db_url = std::env::var("DB_URL").unwrap_or_else(|_| "./db.sqlite".to_string());
+
+    let oauth_client_id = std::env::var("GITHUB_OAUTH_CLIENT_ID").unwrap();
+    let oauth_client_secret = std::env::var("GITHUB_OAUTH_CLIENT_SECRET").unwrap();
 
     // Create the DB
     let pool = match PoolBuilder::new().path(db_url).open().await {
@@ -91,15 +99,24 @@ async fn main() -> std::io::Result<()> {
                 client: client.clone(),
                 config: config.clone(),
                 pool: pool.clone(),
+                oauth_creds: OauthCreds {
+                    client_id: oauth_client_id.clone(),
+                    client_secret: oauth_client_secret.clone(),
+                },
             }))
             .app_data(web::Data::new(ws_channels.clone()))
             .service(Files::new("assets/", "assets/"))
             .service(routes::index::get)
             .service(routes::scoreboard::get)
-            .service(routes::set_scores::post)
-            .service(routes::set_scores::get)
+            .service(
+                web::scope("/set_scores")
+                    .wrap(Authentication::new(AuthConfig::require_set_score()))
+                    .service(routes::set_scores::get)
+                    .service(routes::set_scores::post),
+            )
             .service(routes::results::get)
             .service(routes::ws::get)
+            .service(routes::oauth::callback_get)
     })
     .bind((host, port))?
     .run()
@@ -110,5 +127,11 @@ async fn main() -> std::io::Result<()> {
 struct AppState {
     client: reqwest::Client,
     config: Configuration,
+    oauth_creds: OauthCreds,
     pool: async_sqlite::Pool,
+}
+
+struct OauthCreds {
+    client_id: String,
+    client_secret: String,
 }

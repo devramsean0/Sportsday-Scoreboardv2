@@ -9,7 +9,7 @@ use crate::{
     AppState,
 };
 
-#[get("/set_scores")]
+#[get("")]
 pub async fn get(state: web::Data<AppState>, params: web::Query<Params>) -> HttpResponse {
     let events = Events::r#where(
         &state.pool,
@@ -33,7 +33,7 @@ pub async fn get(state: web::Data<AppState>, params: web::Query<Params>) -> Http
     )
 }
 
-#[post("/set_scores")]
+#[post("")]
 pub async fn post(
     state: web::Data<AppState>,
     body: String,

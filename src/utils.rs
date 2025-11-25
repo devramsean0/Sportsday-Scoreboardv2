@@ -63,3 +63,14 @@ pub async fn render_scoreboard(state: web::Data<AppState>) -> String {
     .expect("template should bee valid");
     html
 }
+
+#[macro_export]
+macro_rules! ternary {
+    ($condition: expr => $true_expr: expr , $false_expr: expr) => {
+        if $condition {
+            $true_expr
+        } else {
+            $false_expr
+        }
+    };
+}
