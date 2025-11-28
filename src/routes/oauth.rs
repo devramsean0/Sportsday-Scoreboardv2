@@ -2,7 +2,7 @@ use actix_web::{
     cookie::{time::Duration, Cookie},
     get, web, HttpRequest, HttpResponse,
 };
-use log::{debug, error};
+use log::{debug, error, info};
 use reqwest::StatusCode;
 
 use crate::{db, AppState};
@@ -80,11 +80,31 @@ pub async fn callback_get(
             user_email = email.email.clone();
         }
     }
-    let user = db::users::Users::get_or_create(user_email, &state.pool)
+
+    // Get Count of users to calculate if this will be the first user
+    let user_count = db::users::Users::all(&state.pool).await.unwrap().len();
+
+    let mut user = db::users::Users::get_or_create(user_email, &state.pool)
         .await
         .unwrap();
 
     debug!("Got User with ID {}", user.id.unwrap());
+    if user_count == 0 {
+        info!("First User Created, Granting admin");
+        db::users::Users::update(
+            &state.pool,
+            user.id.unwrap(),
+            user.clone().email,
+            true,
+            true,
+        )
+        .await
+        .unwrap();
+
+        user = db::users::Users::get_or_create(user.clone().email, &state.pool)
+            .await
+            .unwrap();
+    }
     let session = user.clone().new_session();
     debug!(
         "Created session for user {} with id {}",
