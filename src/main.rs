@@ -15,6 +15,7 @@ use crate::{
 mod configurator;
 mod db;
 mod middleware;
+mod prometheus;
 mod routes;
 mod templates;
 mod utils;
@@ -99,6 +100,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .wrap(ActixMiddleware::Logger::default())
             .wrap(middleware::headers::DefaultHtmlContentType)
+            .wrap(prometheus::build_prom())
             .app_data(web::Data::new(AppState {
                 client: client.clone(),
                 config: config.clone(),
